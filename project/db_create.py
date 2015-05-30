@@ -1,25 +1,14 @@
 __author__ = 'jonathan'
 
-import sqlite3
-from _config import DATABASE_PATH
+from views import db
+from models import Task
+from datetime import date
 
-with sqlite3.connect(DATABASE_PATH) as connection:
+# creates the tables imported above that extend db.Model
+db.create_all()
 
-    c = connection.cursor()
+#insert data into tasks table
+db.session.add(Task("Finish the Task App", date(2015, 5, 31), 10, 1))
+db.session.add(Task("Complete Django Tutorial", date(2015, 6, 1), 10, 1))
 
-    c.execute("""CREATE TABLE tasks(
-            task_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            due_date TEXT NOT NULL,
-            priority INTEGER NOT NULL,
-            status INTEGER NOT NULL)
-    """)
-
-    c.execute(
-        'INSERT INTO tasks (name, due_date, priority, status)'
-        'VALUES("Complete Flask taskapp", "05/31/15", 10, 1)'
-    )
-    c.execute(
-        'INSERT INTO tasks (name, due_date, priority, status)'
-        'VALUES("Complete Django tutorial", "05/30/15", 8, 1)'
-    )
+db.session.commit()
