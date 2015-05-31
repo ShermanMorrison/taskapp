@@ -1,22 +1,25 @@
 __author__ = 'jonathan'
 
-import sqlite3
-from functools import wraps
 
+
+
+from functools import wraps
 from flask import Flask, flash, redirect, render_template, \
     request, session, url_for, g
 
-from forms import AddTaskForm
+from forms import AddTaskForm, RegisterForm, LoginForm
 from flask.ext.sqlalchemy import SQLAlchemy
 
+###################
 # config settings
 
 app = Flask(__name__)
 app.config.from_object('_config')
 db = SQLAlchemy(app)
 
-from models import Task
+from models import Task, User
 
+####################
 # helper functions
 
 def login_required(test):
@@ -29,6 +32,7 @@ def login_required(test):
             return redirect(url_for('login'))
     return wrap
 
+####################
 # route handlers
 
 @app.route('/logout/')
@@ -39,20 +43,25 @@ def logout():
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    error = None
+    form = LoginForm(request.form)
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME'] \
-            or request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid Credentials. Please try again'
-            return render_template('login.html', error=error)
+        if form.validate_on_submit():
+            user = db.session.query(User) \
+                .filter_by(name=form.name.data).first()
+            if user is not None and user.password == \
+                    form.password.data:
+                session['logged_in'] = True
+                flash('Welcome ' + user.name + "!")
+                return redirect(url_for('tasks'))
+            else:
+                error = 'Invalid username or password.'
         else:
-            session['logged_in'] = True
-            flash('Welcome!')
-            return redirect(url_for('tasks'))
+            error = 'Both fields are required'
+    return render_template('login.html', form=form, error=error)
 
-    return render_template('login.html')
 
 # route to display tasks
-
 @app.route('/tasks/')
 @login_required
 def tasks():
@@ -104,6 +113,28 @@ def delete_entry(task_id):
     db.session.commit()
     flash('Deleted task with id = ' + str(task_id))
     return redirect(url_for('tasks'))
+
+# register page.
+# add to User table on POST
+# render on GET
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+    error = None
+    form = RegisterForm(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            new_user = User(
+                form.name.data,
+                form.email.data,
+                form.password.data
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Thanks for registering. Please log in.')
+            return redirect(url_for('login'))
+        else:
+            error = 'There was an error in your registration. Please try again.'
+    return render_template('register.html', form=form, error=error)
 
 
 

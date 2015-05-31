@@ -5,8 +5,6 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 DATABASE = 'taskapp.db'
-USERNAME = 'admin'
-PASSWORD = 'admin'
 WTF_CSRF_ENABLED = True
 SECRET_KEY = '\x04\x875(\x932t\xc6+9uT!yQ\x8c\xba\xd2a\xe4\xee\xa4\xc9\x97'
 
