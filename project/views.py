@@ -5,11 +5,11 @@ __author__ = 'jonathan'
 
 from functools import wraps
 from flask import Flask, flash, redirect, render_template, \
-    request, session, url_for, g
+    request, session, url_for
 
 from forms import AddTaskForm, RegisterForm, LoginForm
 from flask.ext.sqlalchemy import SQLAlchemy
-
+from datetime import datetime
 ###################
 # config settings
 
@@ -38,6 +38,7 @@ def login_required(test):
 @app.route('/logout/')
 def logout():
     session.pop('logged_in', None)
+    session.pop('user_id', None)
     flash('Goodbye!')
     return redirect(url_for('login'))
 
@@ -52,6 +53,7 @@ def login():
             if user is not None and user.password == \
                     form.password.data:
                 session['logged_in'] = True
+                session['user_id'] = user.id
                 flash('Welcome ' + user.name + "!")
                 return redirect(url_for('tasks'))
             else:
@@ -87,7 +89,9 @@ def new_task():
                 form.name.data,
                 form.due_date.data,
                 form.priority.data,
-                '1'
+                datetime.utcnow(),
+                '1',
+                session['user_id']
             )
             db.session.add(task_to_add)
             db.session.commit()
