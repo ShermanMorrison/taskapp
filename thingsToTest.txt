@@ -1,0 +1,19 @@
+/login
+-User login with valid credentials directs him to /tasks
+-User login with invalid credentials gives error message
+-User login with non-existent user gives error message
+-User clicks register link directs him to /register
+
+/register
+-User register with valid credentials directs him to /
+-User register with invalid credentials gives error message
+-User clicks login link directs him to /
+-User registers with already-registered name/email gives error
+
+/tasks
+-User add task with valid fields adds task to open_tasks
+-User add task with invalid fields gives error
+-User clicks mark-as-complete moves task to closed_task
+-User clicks delete deletes task
+
+
