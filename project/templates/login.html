@@ -4,7 +4,7 @@
 <h1>Welcome to the Flask Task App.</h1>
 <h3>Please log in to access your task list.</h3>
 
-<form method="post" action="/">
+<form class="form-signin" role="form" method="post" action="/">
     {{ form.csrf_token }}
     <p>
         {{ form.name.label }}: {{ form.name }}
@@ -25,7 +25,7 @@
             </span>
         {% endif %}
         &nbsp; &nbsp;
-        <input type="submit" value="Submit">
+        <button class="btn btn-sm btn-success" type="submit">Sign in</button>
     </p>
 </form>
 
